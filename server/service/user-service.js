@@ -15,7 +15,7 @@ class UserService{
         const hashPassword = await bcrypt.hash(password,5);
         const activationLink = uuid.v4();
         const user = await UserSchema.create({email, password:hashPassword, activationLink});
-        mailService.sendActivationMail(email, `${process.env.HOST}/api/activate/${activationLink}`);
+      //      mailService.sendActivationMail(email, `${process.env.HOST}/api/activate/${activationLink}`);
         const userDto = new UserDto(user);
         const tokens = tokenService.generateTokens({...userDto});
         tokenService.saveToken(userDto.id, tokens.refreshToken);
@@ -65,7 +65,7 @@ class UserService{
         if(!userData || !tokenFromDb){
             throw ApiError.UnauthorizedError();
         }
-        const user = UserSchema.findOne({where:{id:tokenFromDb.id}})
+        const user = await UserSchema.findOne({where:{id:tokenFromDb.userId}})
         const userDto = new UserDto(user);
         const tokens = tokenService.generateTokens({...userDto});
         tokenService.saveToken(userDto.id, tokens.refreshToken);
